@@ -178,7 +178,7 @@ export const AddOrder: React.FC<AddOrderProps> = ({
   };
 
   return (
-    <div className="space-y-5 pb-24">
+    <div className="space-y-5 pb-56 md:pb-24">
       {/* Top action header */}
       <div className="flex items-center gap-3">
         <button
@@ -445,7 +445,7 @@ export const AddOrder: React.FC<AddOrderProps> = ({
         </div>
 
         {/* Submission Bottom Actions - Sticky at bottom for mobile layout comfort */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-stone-100/90 backdrop-blur-md md:static md:bg-transparent md:p-0 flex items-center justify-between gap-3 border-t border-stone-200/50 md:border-0 z-40">
+        <div className="fixed bottom-24 left-0 right-0 p-4 bg-stone-100/90 backdrop-blur-md md:static md:bg-transparent md:p-0 flex items-center justify-between gap-3 border-t border-stone-200/50 md:border-0 z-40">div className="fixed bottom-0 left-0 right-0 p-4 bg-stone-100/90 backdrop-blur-md md:static md:bg-transparent md:p-0 flex items-center justify-between gap-3 border-t border-stone-200/50 md:border-0 z-40">
           <button
             type="button"
             onClick={onCancel}
