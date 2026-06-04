@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Font Families configuration */
+  --font-sans: "Plus Jakarta Sans", "Poppins", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Custom Color System */
+  --color-bg-utama: #F7F3EA;
+  --color-primary-dark: #1F2933;
+  --color-espresso: #3A2E2A;
+  --color-cream-soft: #EADDC8;
+  --color-copper: #A8875B;
+  --color-hijau-lunas: #22C55E;
+  --color-kuning-dp: #F59E0B;
+  --color-merah-unpaid: #EF4444;
+  --color-abu-teks: #5F5A54;
+  --color-border-soft: #E2D8C8;
+  --color-card-putih: #FFFFFF;
+}
+
+/* Custom CSS overrides for gorgeous tailoring apps look & feel */
+body {
+  background-color: #F7F3EA;
+  color: #1F2933;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide web scrollbar elegantly */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #EADDC8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A8875B;
+}
+
+/* 2xs and 3xs utility mappings for small device alignments */
+.text-2xs {
+  font-size: 0.65rem;
+}
+.text-3xs {
+  font-size: 0.55rem;
+}

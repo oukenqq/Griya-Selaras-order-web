@@ -1,0 +1,6 @@
+{
+  "name": "Griya Selaras Order",
+  "description": "Aplikasi pencatatan pesanan dan keuangan sederhana untuk UMKM jahit Griya Selaras by Syuhada.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
