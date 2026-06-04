@@ -13,6 +13,7 @@ import { AddOrder } from "./pages/AddOrder";
 import { OrderDetail } from "./pages/OrderDetail";
 import { Finance } from "./pages/Finance";
 import { Settings } from "./pages/Settings";
+import { PWABanner } from "./components/PWABanner";
 
 // Import Icons
 import { 
@@ -402,6 +403,9 @@ export default function App() {
           <span className="text-[9px] font-extrabold tracking-tight">Menej</span>
         </button>
       </nav>
+
+      {/* Beautiful Floating dark PWA Install banner with instructions */}
+      <PWABanner isInstallable={isInstallable} onInstallApp={handleInstallApp} />
     </div>
   );
 }
