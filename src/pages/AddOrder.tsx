@@ -178,7 +178,7 @@ export const AddOrder: React.FC<AddOrderProps> = ({
   };
 
   return (
-    <div className="space-y-5 pb-56 md:pb-24">
+    <div className="space-y-5 pb-24">
       {/* Top action header */}
       <div className="flex items-center gap-3">
         <button
@@ -444,19 +444,19 @@ export const AddOrder: React.FC<AddOrderProps> = ({
           </div>
         </div>
 
-        {/* Submission Bottom Actions - Sticky at bottom for mobile layout comfort */}
-        <div className="fixed bottom-24 left-0 right-0 p-4 bg-stone-100/90 backdrop-blur-md md:static md:bg-transparent md:p-0 flex items-center justify-between gap-3 border-t border-stone-200/50 md:border-0 z-40">div className="fixed bottom-0 left-0 right-0 p-4 bg-stone-100/90 backdrop-blur-md md:static md:bg-transparent md:p-0 flex items-center justify-between gap-3 border-t border-stone-200/50 md:border-0 z-40">
+        {/* Submission Bottom Actions - Inline list above the bottom navigation bar to avoid overlaying on mobile */}
+        <div className="flex items-center justify-between gap-3 pt-6 border-t border-stone-200/60 mt-6 font-bold z-10">
           <button
             type="button"
             onClick={onCancel}
-            className="w-1/3 md:w-auto py-3.5 px-6 rounded-xl text-sm font-semibold border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 transition-all font-bold active:scale-95"
+            className="w-1/3 md:w-auto py-3.5 px-6 rounded-xl text-sm font-bold border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 transition-all active:scale-95 cursor-pointer"
           >
             Batal
           </button>
           
           <button
             type="submit"
-            className="flex-1 md:flex-initial flex items-center justify-center gap-2 py-3.5 px-8 bg-stone-900 hover:bg-stone-850 rounded-xl text-sm font-extrabold text-stone-100 shadow-md active:scale-95 transition-all"
+            className="flex-1 md:flex-initial flex items-center justify-center gap-2 py-3.5 px-8 bg-stone-900 hover:bg-stone-850 rounded-xl text-sm font-extrabold text-white shadow-md active:scale-95 transition-all cursor-pointer"
           >
             <Save className="w-4.5 h-4.5 text-amber-500" />
             <span>Simpan Pesanan</span>

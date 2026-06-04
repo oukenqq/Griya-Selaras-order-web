@@ -52,17 +52,3 @@ body {
 .text-3xs {
   font-size: 0.55rem;
 }
-/* Fix mobile: konten form tidak ketutup bottom navigation */
-@media (max-width: 768px) {
-  main,
-  .app-content,
-  .page-content,
-  .form-page,
-  .order-form {
-    padding-bottom: calc(170px + env(safe-area-inset-bottom));
-  }
-
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}

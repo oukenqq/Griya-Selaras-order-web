@@ -20,23 +20,8 @@
     <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
-
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function () {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .then(function () {
-            console.log("Service Worker registered");
-          })
-          .catch(function (error) {
-            console.log("Service Worker registration failed:", error);
-          });
-      });
-    }
-  </script>
-</body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
 
