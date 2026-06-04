@@ -3,17 +3,29 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Manual service worker registration script for absolute compatibility with all mobile web browsers
-if ('serviceWorker' in navigator && (import.meta as any).env?.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-      .then((reg) => {
-        console.log('PWA Service Worker registered successfully with scope:', reg.scope);
-      })
-      .catch((err) => {
-        console.error('PWA Service Worker registration failed:', err);
-      });
-  });
+// Safe, one-time cleanup of any legacy or broken service workers to prevent "Page Not Found" caching issues
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  const CLEANUP_KEY = 'griya_sw_cleanup_v5';
+  if (!localStorage.getItem(CLEANUP_KEY)) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      if (registrations.length > 0) {
+        Promise.all(registrations.map(r => r.unregister())).then(() => {
+          localStorage.setItem(CLEANUP_KEY, 'true');
+          if ('caches' in window) {
+            caches.keys().then((names) => {
+              Promise.all(names.map(name => caches.delete(name))).then(() => {
+                (window as any).location.reload();
+              });
+            });
+          } else {
+            (window as any).location.reload();
+          }
+        });
+      } else {
+        localStorage.setItem(CLEANUP_KEY, 'true');
+      }
+    });
+  }
 }
 
 createRoot(document.getElementById('root')!).render(

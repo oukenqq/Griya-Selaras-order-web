@@ -3,7 +3,7 @@ import { Order } from "../types";
 import { formatRupiah } from "../utils/formatCurrency";
 import { formatIndonesianDate, isDatePassed, isDateNear } from "../utils/dateUtils";
 import { StatusBadge } from "../components/StatusBadge";
-import { Calendar, CheckCircle2, DollarSign, Hourglass, RefreshCw, AlertTriangle, ChevronRight, Plus } from "lucide-react";
+import { Calendar, CheckCircle2, DollarSign, Hourglass, RefreshCw, AlertTriangle, ChevronRight, Plus, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 
 interface DashboardProps {
@@ -11,6 +11,8 @@ interface DashboardProps {
   onNavigateToTab: (tab: string) => void;
   onSelectOrder: (orderId: string) => void;
   onAddNewOrder: () => void;
+  isInstallable?: boolean;
+  onInstallApp?: () => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -18,6 +20,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onNavigateToTab,
   onSelectOrder,
   onAddNewOrder,
+  isInstallable = false,
+  onInstallApp,
 }) => {
   // Current month filter
   const today = new Date();
@@ -103,6 +107,36 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <span>Tambah Pesanan Baru</span>
         </button>
       </div>
+
+      {/* PWA Direct Installation Banner */}
+      {isInstallable && onInstallApp && (
+        <motion.div
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="p-5 bg-gradient-to-r from-stone-900 via-stone-850 to-stone-900 border border-stone-850 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg text-stone-100"
+        >
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-500 shrink-0">
+              <Sparkles className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <h4 className="text-base font-bold text-white flex items-center gap-2">
+                Pasang Aplikasi Griya Order di HP
+              </h4>
+              <p className="text-stone-300 text-xs mt-1 max-w-xl">
+                Dapatkan pengalaman seperti aplikasi asli (native app) langsung di Android / iOS Anda! Lebih cepat, hemat kuota, dan ikon aplikasi akan muncul di layar utama (Home-Screen).
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onInstallApp}
+            className="w-full md:w-auto shrink-0 flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-stone-950 font-bold rounded-xl transition-all shadow-md text-sm cursor-pointer"
+          >
+            <Sparkles className="w-4.5 h-4.5" />
+            <span>Pasang Sekarang</span>
+          </button>
+        </motion.div>
+      )}
 
       {/* Warning Banner if there is late orders */}
       {lateOrdersCount > 0 && (

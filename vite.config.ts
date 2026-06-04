@@ -12,6 +12,7 @@ export default defineConfig(() => {
       VitePWA({
         injectRegister: 'inline',
         registerType: 'autoUpdate',
+        manifestFilename: 'manifest.json',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
         manifest: {
           id: '/',

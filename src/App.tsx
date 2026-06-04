@@ -32,12 +32,43 @@ export default function App() {
   const [profile, setProfile] = useState<UMKMProfile>({ name: "", owner: "", address: "", phone: "" });
   const [services, setServices] = useState<ServiceConfig[]>([]);
 
-  // Load Initial Data on Mount
+  // PWA Install state
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  // Load Initial Data on Mount & setting PWA listeners
   useEffect(() => {
     setOrders(getOrders());
     setProfile(getProfile());
     setServices(getServices());
+
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
+
+    // If already launched in standalone screen mode
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstallable(false);
+    }
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+    };
   }, []);
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      setIsInstallable(false);
+    }
+    setDeferredPrompt(null);
+  };
 
   // Handlers for Data adjustments
   const handleAddNewOrder = (orderData: Omit<Order, "id" | "sisaBayar" | "createdAt" | "updatedAt">) => {
@@ -142,6 +173,8 @@ export default function App() {
             onNavigateToTab={executeNavigateToTab}
             onSelectOrder={executeInspectOrderDetails}
             onAddNewOrder={() => executeNavigateToTab("add_order")}
+            isInstallable={isInstallable}
+            onInstallApp={handleInstallApp}
           />
         );
       case "orders":
