@@ -1,5 +1,6 @@
 import React from "react";
 import { Order } from "../types";
+import { formatOrderId } from "../utils/supabaseService";
 import { formatRupiah } from "../utils/formatCurrency";
 import { formatIndonesianDate, isDatePassed, isDateNear } from "../utils/dateUtils";
 import { StatusBadge } from "../components/StatusBadge";
@@ -266,7 +267,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <div className="space-y-1.5 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono text-xs font-bold text-stone-400">
-                        {order.id}
+                        {formatOrderId(order.id)}
                       </span>
                       <h4 className="font-bold text-stone-900 text-base">
                         {order.namaCustomer}

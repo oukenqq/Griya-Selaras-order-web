@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { 
-  getProfile, saveProfile, getServices, saveServices, clearAllData,
-  getOrders, generateNextOrderId
+  getProfile, saveProfile, getServices, saveServices, clearAllData
 } from "./utils/storage";
 import { Order, UMKMProfile } from "./types";
 import { ServiceConfig } from "./data/defaultServices";
@@ -123,14 +122,14 @@ export default function App() {
   // Handlers for Data adjustments connected with Supabase real-time backend
   const handleAddNewOrder = async (orderData: Omit<Order, "id" | "sisaBayar" | "createdAt" | "updatedAt">) => {
     try {
-      const nextId = generateNextOrderId(orders);
-      const freshOrder = await insertSupabaseOrder({ ...orderData, id: nextId });
+      const freshOrder = await insertSupabaseOrder(orderData);
       await refreshOrders(); // Reload lists from DB
       
       // Auto redirect to its newly made kuitansi / details page
       setSelectedOrderId(freshOrder.id);
       setActiveTab("orders");
     } catch (e: any) {
+      console.error("Gagal menambahkan data ke database Supabase:", e);
       alert("Gagal menambahkan data ke database Supabase: " + (e.message || e));
     }
   };

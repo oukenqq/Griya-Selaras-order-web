@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Order } from "../types";
+import { formatOrderId } from "../utils/supabaseService";
 import { formatRupiah } from "../utils/formatCurrency";
 import { formatIndonesianDate, isDatePassed } from "../utils/dateUtils";
 import { StatusBadge } from "../components/StatusBadge";
@@ -82,7 +83,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs font-bold text-stone-400 bg-stone-100 border border-stone-200 px-2 py-0.5 rounded-lg">
-                {order.id}
+                {formatOrderId(order.id)}
               </span>
               <h2 className="text-xl font-bold text-stone-950">Detail Pesanan</h2>
             </div>
@@ -373,7 +374,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({
           onBack();
         }}
         title="Hapus Pesanan?"
-        message={`Apakah Anda benar-benar yakin ingin menghapus pesanan atas nama "${order.namaCustomer}" (${order.id})? Tindakan ini menghapus data selamanya.`}
+        message={`Apakah Anda benar-benar yakin ingin menghapus pesanan atas nama "${order.namaCustomer}" (${formatOrderId(order.id)})? Tindakan ini menghapus data selamanya.`}
         confirmText="Ya, Hapus Saja"
         cancelText="Batal/Kembali"
       />

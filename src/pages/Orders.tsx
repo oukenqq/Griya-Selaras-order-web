@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Order } from "../types";
+import { formatOrderId } from "../utils/supabaseService";
 import { formatRupiah } from "../utils/formatCurrency";
 import { formatIndonesianDate, isDatePassed, isDateNear } from "../utils/dateUtils";
 import { StatusBadge } from "../components/StatusBadge";
@@ -29,7 +30,7 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
     const matchesSearch =
       order.namaCustomer.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.nomorWhatsApp.includes(searchTerm) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase());
+      formatOrderId(order.id).toLowerCase().includes(searchTerm.toLowerCase());
 
     // 2. Filter pengerjaan
     const matchesPengerjaan = pengerjaanFilter === "Semua" || order.statusPengerjaan === pengerjaanFilter;
@@ -240,7 +241,7 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
                   <div className="space-y-1 border-stone-200 pr-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono text-3xs font-extrabold text-stone-400 bg-stone-100/80 border border-stone-200/60 px-1.5 py-0.5 rounded-md">
-                        {order.id}
+                        {formatOrderId(order.id)}
                       </span>
                       <h4 className="font-bold text-stone-900 text-base leading-tight">
                         {order.namaCustomer}

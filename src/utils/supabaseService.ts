@@ -6,8 +6,9 @@ import { StatusPembayaran, StatusPengerjaan, StatusPengambilan } from "../data/s
  * Mapper function to convert Supabase rows to Front-end Order object
  */
 export const mapRowToOrder = (row: any): Order => {
+  const rowId = row.id !== undefined && row.id !== null ? String(row.id) : "";
   return {
-    id: row.id || "",
+    id: rowId,
     tanggalMasuk: row.tanggal_masuk || "",
     namaCustomer: row.nama_pelanggan || "",
     nomorWhatsApp: row.no_hp || "",
@@ -26,6 +27,18 @@ export const mapRowToOrder = (row: any): Order => {
     createdAt: row.created_at || new Date().toISOString(),
     updatedAt: row.updated_at || new Date().toISOString(),
   };
+};
+
+/**
+ * Format any ID (usually database integer/bigint) safely into dynamic show format (ORD-XXXX)
+ */
+export const formatOrderId = (id: string | number): string => {
+  if (!id) return "";
+  const numericId = Number(id);
+  if (!isNaN(numericId) && Number.isInteger(numericId)) {
+    return `ORD-${String(numericId).padStart(4, "0")}`;
+  }
+  return String(id);
 };
 
 /**
@@ -80,7 +93,7 @@ export const fetchSupabaseOrders = async (): Promise<Order[]> => {
  * Insert a new order to Supabase public.pesanan
  */
 export const insertSupabaseOrder = async (
-  orderData: Omit<Order, "id" | "sisaBayar" | "createdAt" | "updatedAt"> & { id?: string }
+  orderData: Omit<Order, "id" | "sisaBayar" | "createdAt" | "updatedAt">
 ): Promise<Order> => {
   // Format harga & dp to strict number
   const hargaNumber = Number(orderData.harga) || 0;
@@ -92,7 +105,7 @@ export const insertSupabaseOrder = async (
     return dateStr.split("T")[0];
   };
 
-  // Payload insertion strictly following the 12 columns requested
+  // Payload insertion strictly following the 12 columns requested (no ID columns, automatic on Supabase)
   const payload = {
     nama_pelanggan: orderData.namaCustomer || "",
     no_hp: orderData.nomorWhatsApp || "",
@@ -112,15 +125,20 @@ export const insertSupabaseOrder = async (
   const { data, error } = await supabase
     .from("pesanan")
     .insert([payload])
-    .select()
-    .single();
+    .select();
 
   if (error) {
-    console.error("Gagal melakukan penambahan data ke Supabase:", error);
-    throw new Error(error.message || JSON.stringify(error));
+    console.error("Gagal insert pesanan:", error);
+    alert(`Gagal menambahkan data: ${error.message}`);
+    throw error;
   }
 
-  return mapRowToOrder(data);
+  const insertedRow = Array.isArray(data) ? data[0] : data;
+  if (!insertedRow) {
+    throw new Error("No data returned from insert");
+  }
+
+  return mapRowToOrder(insertedRow);
 };
 
 /**
