@@ -20,6 +20,7 @@ export default defineConfig(() => {
           short_name: 'Griya Order',
           description: 'Aplikasi internal pencatatan pesanan jahit dan rekap keuangan sederhana Griya Selaras',
           start_url: '/',
+          lang: 'en',
           scope: '/',
           display: 'standalone',
           orientation: 'portrait',
