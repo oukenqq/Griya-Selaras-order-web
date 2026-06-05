@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { motion, AnimatePresence } from "motion/react";
-import { Scissors, Mail, Lock, ShieldAlert, Sparkles, LogIn, UserPlus } from "lucide-react";
+import { Scissors, Mail, Lock, ShieldAlert, Sparkles, LogIn, UserPlus, Eye, EyeOff } from "lucide-react";
 
 interface LoginProps {
   onLoginSuccess: (session: any) => void;
@@ -11,6 +11,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -155,13 +156,25 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-stone-950 border border-stone-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl text-xs text-white focus:outline-none transition-all placeholder-stone-605"
+                className="w-full pl-11 pr-11 py-3 bg-stone-950 border border-stone-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl text-xs text-white focus:outline-none transition-all placeholder-stone-605"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-stone-500 hover:text-stone-300 transition-colors focus:outline-none bg-transparent border-none cursor-pointer flex items-center justify-center"
+                title={showPassword ? "Sembunyikan Kata Sandi" : "Tampilkan Kata Sandi"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4 stroke-[2]" />
+                ) : (
+                  <Eye className="w-4 h-4 stroke-[2]" />
+                )}
+              </button>
             </div>
           </div>
 
