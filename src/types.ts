@@ -7,6 +7,7 @@ export interface Order {
   nomorWhatsApp: string;
   jenisLayanan: string;
   catatanPesanan: string;
+  ukuran?: string; // Standard clothing sizing (e.g. S, M, L, XL or custom measurements details)
   harga: number;
   dp: number;
   sisaBayar: number;

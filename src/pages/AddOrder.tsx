@@ -26,6 +26,7 @@ export const AddOrder: React.FC<AddOrderProps> = ({
     nomorWhatsApp: "",
     jenisLayanan: services[0]?.name || "Permak Pakaian",
     catatanPesanan: "",
+    ukuran: "",
     harga: 0,
     dp: 0,
     statusPembayaran: "Belum Bayar" as StatusPembayaran,
@@ -47,6 +48,7 @@ export const AddOrder: React.FC<AddOrderProps> = ({
         nomorWhatsApp: editOrder.nomorWhatsApp,
         jenisLayanan: editOrder.jenisLayanan,
         catatanPesanan: editOrder.catatanPesanan,
+        ukuran: editOrder.ukuran || "",
         harga: editOrder.harga,
         dp: editOrder.dp,
         statusPembayaran: editOrder.statusPembayaran,
@@ -292,12 +294,24 @@ export const AddOrder: React.FC<AddOrderProps> = ({
               </select>
             </div>
 
+            {/* Ukuran Standard / Custom Sizing */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-stone-700">Ukuran Baju / Celana (S, M, L, XL, dll. atau Ukuran Detail)</label>
+              <input
+                type="text"
+                placeholder="Contoh: XL (LD: 105cm, LP: 88cm) atau can be customized"
+                value={formData.ukuran}
+                onChange={(e) => setFormData({ ...formData, ukuran: e.target.value })}
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-stone-400 placeholder-stone-400"
+              />
+            </div>
+
             {/* Catatan detail / Ukuran */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-stone-700">Detail Pesanan & Catatan Ukuran</label>
+              <label className="block text-xs font-bold text-stone-700">Detail Pesanan & Catatan Jahitan Tambahan</label>
               <textarea
                 rows={4}
-                placeholder="Tulis detail ukuran baju (LD, Lp, Pj Lengan, Pj Baju), model pakaian, permintaan payet, warna benang, atau catatan khusus lainnya..."
+                placeholder="Tulis detail model pakaian, permintaan payet, warna benang, furing tambahan, atau catatan khusus lainnya..."
                 value={formData.catatanPesanan}
                 onChange={(e) => setFormData({ ...formData, catatanPesanan: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-stone-400 placeholder-stone-400"

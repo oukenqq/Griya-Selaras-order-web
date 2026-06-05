@@ -164,14 +164,22 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-3xs space-y-3">
             <h3 className="text-sm font-bold text-stone-900 border-b border-stone-100 pb-1.5 flex items-center gap-1.5">
               <ClipboardList className="w-4.5 h-4.5 text-copper" />
-              <span>Model & Catatan Jahitan</span>
+              <span>Model & Informasi Jahitan</span>
             </h3>
 
+            {order.ukuran && (
+              <div className="space-y-1 bg-amber-500/5 p-3.5 border border-amber-500/10 rounded-xl">
+                <span className="text-3xs font-extrabold uppercase tracking-widest text-amber-600 block">Ukuran Baju / Celana:</span>
+                <p className="text-stone-900 font-bold text-sm leading-relaxed">{order.ukuran}</p>
+              </div>
+            )}
+
             <div className="bg-stone-50 p-4 rounded-xl border border-stone-100/60">
+              <span className="text-3xs font-extrabold uppercase tracking-widest text-stone-450 block mb-1.5">Detail & Catatan Tambahan:</span>
               {order.catatanPesanan ? (
-                <p className="text-stone-800 text-sm leading-relaxed whitespace-pre-wrap">{order.catatanPesanan}</p>
+                <p className="text-stone-805 text-xs/relaxed whitespace-pre-wrap">{order.catatanPesanan}</p>
               ) : (
-                <p className="text-stone-400 text-xs italic">Tidak ada catatan bentuk jahitan atau ukuran.</p>
+                <p className="text-stone-400 text-xs italic">Tidak ada catatan bentuk jahitan tambahan.</p>
               )}
             </div>
 
