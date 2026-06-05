@@ -53,8 +53,8 @@ export default function App() {
       const data = await fetchSupabaseOrders();
       setOrders(data);
     } catch (e) {
-      console.error("Gagal sinkronisasi data dari Supabase, menggunakan fallback penyimpanan lokal:", e);
-      setOrders(getOrders());
+      console.error("Gagal sinkronisasi data dari Supabase:", e);
+      setOrders([]);
     }
   };
 

@@ -82,42 +82,42 @@ export const fetchSupabaseOrders = async (): Promise<Order[]> => {
 export const insertSupabaseOrder = async (
   orderData: Omit<Order, "id" | "sisaBayar" | "createdAt" | "updatedAt"> & { id?: string }
 ): Promise<Order> => {
-  const sisaBayar = Math.max(0, orderData.harga - orderData.dp);
-  const nowStr = new Date().toISOString();
+  // Format harga & dp to strict number
+  const hargaNumber = Number(orderData.harga) || 0;
+  const dpNumber = Number(orderData.dp) || 0;
 
-  // If no manually assigned ID is in params, create temporary or let supabase generate
-  const mappedRow = {
-    tanggal_masuk: orderData.tanggalMasuk,
-    nama_pelanggan: orderData.namaCustomer,
-    no_hp: orderData.nomorWhatsApp,
-    jenis_layanan: orderData.jenisLayanan,
-    detail_pesanan: orderData.catatanPesanan,
+  // Format tanggal_masuk and deadline to strict YYYY-MM-DD
+  const formatToYYYYMMDD = (dateStr: string): string => {
+    if (!dateStr) return "";
+    return dateStr.split("T")[0];
+  };
+
+  // Payload insertion strictly following the 12 columns requested
+  const payload = {
+    nama_pelanggan: orderData.namaCustomer || "",
+    no_hp: orderData.nomorWhatsApp || "",
+    jenis_layanan: orderData.jenisLayanan || "",
+    detail_pesanan: orderData.catatanPesanan || "",
     ukuran: orderData.ukuran || "",
-    harga: orderData.harga,
-    dp: orderData.dp,
-    sisa_bayar: sisaBayar,
-    status_pesanan: orderData.statusPengerjaan,
-    status_pembayaran: orderData.statusPembayaran,
-    deadline: orderData.estimasiTanggalPengambilan,
-    catatan: orderData.catatanOwner,
-    created_at: nowStr,
-    updated_at: nowStr,
-  } as any;
+    tanggal_masuk: formatToYYYYMMDD(orderData.tanggalMasuk),
+    deadline: formatToYYYYMMDD(orderData.estimasiTanggalPengambilan),
+    harga: hargaNumber,
+    dp: dpNumber,
+    status_pesanan: orderData.statusPengerjaan || "Pesanan Masuk",
+    status_pembayaran: orderData.statusPembayaran || "Belum Bayar",
+    catatan: orderData.catatanOwner || "",
+  };
 
-  // Let's check if there is an id requested (e.g. ORD-0005)
-  if (orderData.id) {
-    mappedRow.id = orderData.id;
-  }
-
+  // Run the insert action directly on Supabase table public.pesanan
   const { data, error } = await supabase
     .from("pesanan")
-    .insert([mappedRow])
+    .insert([payload])
     .select()
     .single();
 
   if (error) {
-    console.error("Error inserting order to Supabase:", error);
-    throw error;
+    console.error("Gagal melakukan penambahan data ke Supabase:", error);
+    throw new Error(error.message || JSON.stringify(error));
   }
 
   return mapRowToOrder(data);
