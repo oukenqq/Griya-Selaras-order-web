@@ -33,7 +33,18 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
       formatOrderId(order.id).toLowerCase().includes(searchTerm.toLowerCase());
 
     // 2. Filter pengerjaan
-    const matchesPengerjaan = pengerjaanFilter === "Semua" || order.statusPengerjaan === pengerjaanFilter;
+    let matchesPengerjaan = false;
+    if (pengerjaanFilter === "Semua") {
+      // Hide 'Sudah Diambil' by default on 'Semua' view to keep list focused on active ones,
+      // override this if there's an active text search or other specific filters are on.
+      if (searchTerm.trim() !== "" || dateFilter !== "semua" || pembayaranFilter !== "Semua") {
+        matchesPengerjaan = true;
+      } else {
+        matchesPengerjaan = order.statusPengerjaan !== "Sudah Diambil";
+      }
+    } else {
+      matchesPengerjaan = order.statusPengerjaan === pengerjaanFilter;
+    }
 
     // 3. Filter pembayaran
     const matchesPembayaran = pembayaranFilter === "Semua" || order.statusPembayaran === pembayaranFilter;
@@ -52,7 +63,7 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
     if (dateFilter === "hari_ini") {
       matchesDate = order.tanggalMasuk === now.toISOString().split("T")[0];
     } else if (dateFilter === "terlambat") {
-      matchesDate = order.statusPengerjaan !== "Selesai" && order.statusPengambilan !== "Sudah Diambil" && isDatePassed(order.estimasiTanggalPengambilan);
+      matchesDate = order.statusPengerjaan !== "Selesai" && order.statusPengerjaan !== "Sudah Diambil" && order.statusPengambilan !== "Sudah Diambil" && isDatePassed(order.estimasiTanggalPengambilan);
     } else if (dateFilter === "minggu_ini") {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -66,6 +77,13 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
 
   // Sort logic
   const sortedOrders = [...filteredOrders].sort((a, b) => {
+    // Primary sort: if one is already taken and the other is active, put taken at the bottom
+    const isTakenA = a.statusPengerjaan === "Sudah Diambil" ? 1 : 0;
+    const isTakenB = b.statusPengerjaan === "Sudah Diambil" ? 1 : 0;
+    if (isTakenA !== isTakenB) {
+      return isTakenA - isTakenB; // Active (0) first, taken (1) at the bottom
+    }
+
     const timeA = new Date(a.estimasiTanggalPengambilan).getTime();
     const timeB = new Date(b.estimasiTanggalPengambilan).getTime();
     const createdA = new Date(a.createdAt).getTime();
@@ -135,6 +153,20 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
             }`}
           >
             ⚠️ Terlambat
+          </button>
+
+          {/* Quick chip for Sudah Diambil to view finished/taken orders */}
+          <button
+            onClick={() => {
+              setPengerjaanFilter(pengerjaanFilter === "Sudah Diambil" ? "Semua" : "Sudah Diambil");
+            }}
+            className={`px-3 py-2 rounded-xl text-xs font-extrabold border transition-all flex items-center gap-1.5 ${
+              pengerjaanFilter === "Sudah Diambil"
+                ? "bg-green-50 border-green-300 text-green-700"
+                : "border-stone-200 text-stone-600 bg-white hover:bg-stone-50"
+            }`}
+          >
+            <span>✅ Sudah Diambil</span>
           </button>
         </div>
 
@@ -220,8 +252,9 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
           </div>
         ) : (
           sortedOrders.map((order, index) => {
-            const isLate = order.statusPengerjaan !== "Selesai" && order.statusPengambilan !== "Sudah Diambil" && isDatePassed(order.estimasiTanggalPengambilan);
+            const isLate = order.statusPengerjaan !== "Selesai" && order.statusPengerjaan !== "Sudah Diambil" && order.statusPengambilan !== "Sudah Diambil" && isDatePassed(order.estimasiTanggalPengambilan);
             const isNear = isDateNear(order.estimasiTanggalPengambilan);
+            const isTaken = order.statusPengerjaan === "Sudah Diambil";
 
             return (
               <motion.div
@@ -231,7 +264,9 @@ export const Orders: React.FC<OrdersProps> = ({ orders, onSelectOrder, onAddNewO
                 transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.3) }}
                 onClick={() => onSelectOrder(order.id)}
                 className={`bg-white p-4 rounded-xl border ${
-                  isLate
+                  isTaken
+                    ? "border-green-200 bg-green-50/5 hover:border-green-350 opacity-90"
+                    : isLate
                     ? "border-red-300 bg-red-50/10 hover:border-red-400"
                     : "border-stone-200 hover:border-amber-400/60"
                 } shadow-3xs hover:shadow-xs cursor-pointer active:bg-stone-50 transition-all flex flex-col gap-3.5`}
