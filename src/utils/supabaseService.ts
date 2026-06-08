@@ -47,7 +47,6 @@ export const formatOrderId = (id: string | number): string => {
 export const mapOrderToRow = (order: Partial<Order>): any => {
   const row: any = {};
   
-  if (order.id !== undefined) row.id = order.id;
   if (order.tanggalMasuk !== undefined) row.tanggal_masuk = order.tanggalMasuk;
   if (order.namaCustomer !== undefined) row.nama_pelanggan = order.namaCustomer;
   if (order.nomorWhatsApp !== undefined) row.no_hp = order.nomorWhatsApp;
@@ -56,7 +55,6 @@ export const mapOrderToRow = (order: Partial<Order>): any => {
   if (order.ukuran !== undefined) row.ukuran = order.ukuran;
   if (order.harga !== undefined) row.harga = order.harga;
   if (order.dp !== undefined) row.dp = order.dp;
-  if (order.sisaBayar !== undefined) row.sisa_bayar = order.sisaBayar;
   if (order.statusPembayaran !== undefined) row.status_pembayaran = order.statusPembayaran;
   
   // The user uses "status_pesanan" for process advancement
@@ -66,8 +64,6 @@ export const mapOrderToRow = (order: Partial<Order>): any => {
   
   if (order.estimasiTanggalPengambilan !== undefined) row.deadline = order.estimasiTanggalPengambilan;
   if (order.catatanOwner !== undefined) row.catatan = order.catatanOwner;
-  if (order.createdAt !== undefined) row.created_at = order.createdAt;
-  if (order.updatedAt !== undefined) row.updated_at = order.updatedAt;
 
   return row;
 };
