@@ -44,28 +44,57 @@ export const formatOrderId = (id: string | number): string => {
 /**
  * Mapper function to convert Front-end Order parameter updates to Supabase parameters
  */
-export const mapOrderToRow = (order: Partial<Order>): any => {
-  const row: any = {};
-  
-  if (order.tanggalMasuk !== undefined) row.tanggal_masuk = order.tanggalMasuk;
-  if (order.namaCustomer !== undefined) row.nama_pelanggan = order.namaCustomer;
-  if (order.nomorWhatsApp !== undefined) row.no_hp = order.nomorWhatsApp;
-  if (order.jenisLayanan !== undefined) row.jenis_layanan = order.jenisLayanan;
-  if (order.catatanPesanan !== undefined) row.detail_pesanan = order.catatanPesanan;
-  if (order.ukuran !== undefined) row.ukuran = order.ukuran;
-  if (order.harga !== undefined) row.harga = order.harga;
-  if (order.dp !== undefined) row.dp = order.dp;
-  if (order.statusPembayaran !== undefined) row.status_pembayaran = order.statusPembayaran;
-  
-  // The user uses "status_pesanan" for process advancement
-  if (order.statusPengerjaan !== undefined) {
-    row.status_pesanan = order.statusPengerjaan;
-  }
-  
-  if (order.estimasiTanggalPengambilan !== undefined) row.deadline = order.estimasiTanggalPengambilan;
-  if (order.catatanOwner !== undefined) row.catatan = order.catatanOwner;
+/**
+ * Mapper function to convert Front-end Order parameter updates to Supabase parameters
+ * with strict column whitelisting to ensure columns like sisa_bayar, id, created_at, or updated_at are never sent.
+ */
+export const buildPesananPayload = (data: any): any => {
+  if (!data) return {};
 
-  return row;
+  // Extract from either snake_case (e.g. from user form) or camelCase (e.g. from Order interface) structures
+  const nama_pelanggan = data.nama_pelanggan !== undefined ? data.nama_pelanggan : (data.namaCustomer !== undefined ? data.namaCustomer : undefined);
+  const no_hp = data.no_hp !== undefined ? data.no_hp : (data.nomorWhatsApp !== undefined ? data.nomorWhatsApp : undefined);
+  const jenis_layanan = data.jenis_layanan !== undefined ? data.jenis_layanan : (data.jenisLayanan !== undefined ? data.jenisLayanan : undefined);
+  const detail_pesanan = data.detail_pesanan !== undefined ? data.detail_pesanan : (data.catatanPesanan !== undefined ? data.catatanPesanan : undefined);
+  const ukuran = data.ukuran !== undefined ? data.ukuran : undefined;
+  const tanggal_masuk = data.tanggal_masuk !== undefined ? data.tanggal_masuk : (data.tanggalMasuk !== undefined ? data.tanggalMasuk : undefined);
+  const deadline = data.deadline !== undefined ? data.deadline : (data.estimasiTanggalPengambilan !== undefined ? data.estimasiTanggalPengambilan : undefined);
+  const harga = data.harga !== undefined ? Number(data.harga) : undefined;
+  const dp = data.dp !== undefined ? Number(data.dp) : undefined;
+  const status_pesanan = data.status_pesanan !== undefined ? data.status_pesanan : (data.statusPengerjaan !== undefined ? data.statusPengerjaan : undefined);
+  const status_pembayaran = data.status_pembayaran !== undefined ? data.status_pembayaran : (data.statusPembayaran !== undefined ? data.statusPembayaran : undefined);
+  const status_pengambilan = data.status_pengambilan !== undefined ? data.status_pengambilan : (data.statusPengambilan !== undefined ? data.statusPengambilan : undefined);
+  const catatan = data.catatan !== undefined ? data.catatan : (data.catatanOwner !== undefined ? data.catatanOwner : undefined);
+
+  // Date format helper to strip times if any
+  const toYYYYMMDD = (val: any): string | undefined => {
+    if (!val) return undefined;
+    if (typeof val === "string") {
+      return val.split("T")[0];
+    }
+    return val;
+  };
+
+  const payload: any = {};
+  if (nama_pelanggan !== undefined) payload.nama_pelanggan = nama_pelanggan;
+  if (no_hp !== undefined) payload.no_hp = no_hp;
+  if (jenis_layanan !== undefined) payload.jenis_layanan = jenis_layanan;
+  if (detail_pesanan !== undefined) payload.detail_pesanan = detail_pesanan;
+  if (ukuran !== undefined) payload.ukuran = ukuran;
+  if (tanggal_masuk !== undefined) payload.tanggal_masuk = toYYYYMMDD(tanggal_masuk);
+  if (deadline !== undefined) payload.deadline = toYYYYMMDD(deadline);
+  if (harga !== undefined) payload.harga = harga;
+  if (dp !== undefined) payload.dp = dp;
+  if (status_pesanan !== undefined) payload.status_pesanan = status_pesanan;
+  if (status_pembayaran !== undefined) payload.status_pembayaran = status_pembayaran;
+  if (status_pengambilan !== undefined) payload.status_pengambilan = status_pengambilan;
+  if (catatan !== undefined) payload.catatan = catatan;
+
+  return payload;
+};
+
+export const mapOrderToRow = (order: Partial<Order>): any => {
+  return buildPesananPayload(order);
 };
 
 /**
@@ -91,31 +120,7 @@ export const fetchSupabaseOrders = async (): Promise<Order[]> => {
 export const insertSupabaseOrder = async (
   orderData: Omit<Order, "id" | "sisaBayar" | "createdAt" | "updatedAt">
 ): Promise<Order> => {
-  // Format harga & dp to strict number
-  const hargaNumber = Number(orderData.harga) || 0;
-  const dpNumber = Number(orderData.dp) || 0;
-
-  // Format tanggal_masuk and deadline to strict YYYY-MM-DD
-  const formatToYYYYMMDD = (dateStr: string): string => {
-    if (!dateStr) return "";
-    return dateStr.split("T")[0];
-  };
-
-  // Payload insertion strictly following the 12 columns requested (no ID columns, automatic on Supabase)
-  const payload = {
-    nama_pelanggan: orderData.namaCustomer || "",
-    no_hp: orderData.nomorWhatsApp || "",
-    jenis_layanan: orderData.jenisLayanan || "",
-    detail_pesanan: orderData.catatanPesanan || "",
-    ukuran: orderData.ukuran || "",
-    tanggal_masuk: formatToYYYYMMDD(orderData.tanggalMasuk),
-    deadline: formatToYYYYMMDD(orderData.estimasiTanggalPengambilan),
-    harga: hargaNumber,
-    dp: dpNumber,
-    status_pesanan: orderData.statusPengerjaan || "Pesanan Masuk",
-    status_pembayaran: orderData.statusPembayaran || "Belum Bayar",
-    catatan: orderData.catatanOwner || "",
-  };
+  const payload = buildPesananPayload(orderData);
 
   // Run the insert action directly on Supabase table public.pesanan
   const { data, error } = await supabase
@@ -144,16 +149,7 @@ export const updateSupabaseOrder = async (
   id: string,
   ordersUpdates: Partial<Order>
 ): Promise<Order> => {
-  // Recalculate sisa bayar dynamically if price or deposit was modified
-  const updatesPatch = { ...ordersUpdates };
-  if (updatesPatch.harga !== undefined || updatesPatch.dp !== undefined) {
-    const currentPrice = updatesPatch.harga !== undefined ? updatesPatch.harga : 0;
-    const currentDp = updatesPatch.dp !== undefined ? updatesPatch.dp : 0;
-    updatesPatch.sisaBayar = Math.max(0, currentPrice - currentDp);
-  }
-
-  updatesPatch.updatedAt = new Date().toISOString();
-  const rowPatch = mapOrderToRow(updatesPatch);
+  const rowPatch = buildPesananPayload(ordersUpdates);
 
   const { data, error } = await supabase
     .from("pesanan")
