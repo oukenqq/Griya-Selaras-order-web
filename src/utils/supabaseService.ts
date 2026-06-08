@@ -43,51 +43,62 @@ export const formatOrderId = (id: string | number): string => {
 
 /**
  * Mapper function to convert Front-end Order parameter updates to Supabase parameters
- */
-/**
- * Mapper function to convert Front-end Order parameter updates to Supabase parameters
  * with strict column whitelisting to ensure columns like sisa_bayar, id, created_at, or updated_at are never sent.
  */
 export const buildPesananPayload = (data: any): any => {
   if (!data) return {};
 
-  // Extract from either snake_case (e.g. from user form) or camelCase (e.g. from Order interface) structures
-  const nama_pelanggan = data.nama_pelanggan !== undefined ? data.nama_pelanggan : (data.namaCustomer !== undefined ? data.namaCustomer : undefined);
-  const no_hp = data.no_hp !== undefined ? data.no_hp : (data.nomorWhatsApp !== undefined ? data.nomorWhatsApp : undefined);
-  const jenis_layanan = data.jenis_layanan !== undefined ? data.jenis_layanan : (data.jenisLayanan !== undefined ? data.jenisLayanan : undefined);
-  const detail_pesanan = data.detail_pesanan !== undefined ? data.detail_pesanan : (data.catatanPesanan !== undefined ? data.catatanPesanan : undefined);
-  const ukuran = data.ukuran !== undefined ? data.ukuran : undefined;
-  const tanggal_masuk = data.tanggal_masuk !== undefined ? data.tanggal_masuk : (data.tanggalMasuk !== undefined ? data.tanggalMasuk : undefined);
-  const deadline = data.deadline !== undefined ? data.deadline : (data.estimasiTanggalPengambilan !== undefined ? data.estimasiTanggalPengambilan : undefined);
-  const harga = data.harga !== undefined ? Number(data.harga) : undefined;
-  const dp = data.dp !== undefined ? Number(data.dp) : undefined;
-  const status_pesanan = data.status_pesanan !== undefined ? data.status_pesanan : (data.statusPengerjaan !== undefined ? data.statusPengerjaan : undefined);
-  const status_pembayaran = data.status_pembayaran !== undefined ? data.status_pembayaran : (data.statusPembayaran !== undefined ? data.statusPembayaran : undefined);
-  const status_pengambilan = data.status_pengambilan !== undefined ? data.status_pengambilan : (data.statusPengambilan !== undefined ? data.statusPengambilan : undefined);
-  const catatan = data.catatan !== undefined ? data.catatan : (data.catatanOwner !== undefined ? data.catatanOwner : undefined);
-
-  // Date format helper to strip times if any
-  const toYYYYMMDD = (val: any): string | undefined => {
-    if (!val) return undefined;
-    if (typeof val === "string") {
-      return val.split("T")[0];
-    }
-    return val;
-  };
-
   const payload: any = {};
+
+  // 1. nama_pelanggan
+  const nama_pelanggan = data.nama_pelanggan !== undefined ? data.nama_pelanggan : data.namaCustomer;
   if (nama_pelanggan !== undefined) payload.nama_pelanggan = nama_pelanggan;
+
+  // 2. no_hp
+  const no_hp = data.no_hp !== undefined ? data.no_hp : data.nomorWhatsApp;
   if (no_hp !== undefined) payload.no_hp = no_hp;
+
+  // 3. jenis_layanan
+  const jenis_layanan = data.jenis_layanan !== undefined ? data.jenis_layanan : data.jenisLayanan;
   if (jenis_layanan !== undefined) payload.jenis_layanan = jenis_layanan;
+
+  // 4. detail_pesanan
+  const detail_pesanan = data.detail_pesanan !== undefined ? data.detail_pesanan : data.catatanPesanan;
   if (detail_pesanan !== undefined) payload.detail_pesanan = detail_pesanan;
-  if (ukuran !== undefined) payload.ukuran = ukuran;
-  if (tanggal_masuk !== undefined) payload.tanggal_masuk = toYYYYMMDD(tanggal_masuk);
-  if (deadline !== undefined) payload.deadline = toYYYYMMDD(deadline);
-  if (harga !== undefined) payload.harga = harga;
-  if (dp !== undefined) payload.dp = dp;
+
+  // 5. ukuran
+  if (data.ukuran !== undefined) payload.ukuran = data.ukuran;
+
+  // 6. tanggal_masuk
+  const tanggal_masuk = data.tanggal_masuk !== undefined ? data.tanggal_masuk : data.tanggalMasuk;
+  if (tanggal_masuk !== undefined) {
+    payload.tanggal_masuk = typeof tanggal_masuk === "string" ? tanggal_masuk.split("T")[0] : tanggal_masuk;
+  }
+
+  // 7. deadline
+  const deadline = data.deadline !== undefined ? data.deadline : data.estimasiTanggalPengambilan;
+  if (deadline !== undefined) {
+    payload.deadline = typeof deadline === "string" ? deadline.split("T")[0] : deadline;
+  }
+
+  // 8. harga
+  const harga = data.harga !== undefined ? data.harga : undefined;
+  if (harga !== undefined) payload.harga = Number(harga) || 0;
+
+  // 9. dp
+  const dp = data.dp !== undefined ? data.dp : undefined;
+  if (dp !== undefined) payload.dp = Number(dp) || 0;
+
+  // 10. status_pesanan
+  const status_pesanan = data.status_pesanan !== undefined ? data.status_pesanan : data.statusPengerjaan;
   if (status_pesanan !== undefined) payload.status_pesanan = status_pesanan;
+
+  // 11. status_pembayaran
+  const status_pembayaran = data.status_pembayaran !== undefined ? data.status_pembayaran : data.statusPembayaran;
   if (status_pembayaran !== undefined) payload.status_pembayaran = status_pembayaran;
-  if (status_pengambilan !== undefined) payload.status_pengambilan = status_pengambilan;
+
+  // 12. catatan
+  const catatan = data.catatan !== undefined ? data.catatan : data.catatanOwner;
   if (catatan !== undefined) payload.catatan = catatan;
 
   return payload;
@@ -155,15 +166,19 @@ export const updateSupabaseOrder = async (
     .from("pesanan")
     .update(rowPatch)
     .eq("id", id)
-    .select()
-    .single();
+    .select();
 
   if (error) {
     console.error(`Error updating order ${id} in Supabase:`, error);
     throw error;
   }
 
-  return mapRowToOrder(data);
+  const updatedRow = Array.isArray(data) ? data[0] : data;
+  if (!updatedRow) {
+    throw new Error("No data returned from update");
+  }
+
+  return mapRowToOrder(updatedRow);
 };
 
 /**
